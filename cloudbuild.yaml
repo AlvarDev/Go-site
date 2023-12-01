@@ -1,0 +1,19 @@
+steps:
+    # Build app
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/go-demos/my-demo:${BUILD_ID}', '.']
+    id: building
+
+  # Store container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/go-demos/my-demo:$BUILD_ID']
+    id: store
+
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['run', 'deploy', 'go-site',
+            '--image', 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/go-demos/my-demo:$BUILD_ID',
+            '--region', 'southamerica-east1',
+            '--platform', 'managed',
+            '--allow-unauthenticated']
+
